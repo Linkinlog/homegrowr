@@ -23,14 +23,14 @@ class Reading extends Model
 
     public static function atmosphere()
     {
-        $pins = Pin::where('alias', 'Humidity')->orWhere('alias', 'Temperature')->get()->pluck('id');
+        $pins = Pin::where('pin', 'Humidity')->orWhere('pin', 'Temperature')->get()->pluck('id');
 
         $readings = Reading::join('wp_pins', function ($join)
             {
                 $join->on('wp_readings.pin_id', 'wp_pins.id');
             })
-            ->where('wp_pins.alias', 'Humidity')
-            ->orWhere('wp_pins.alias', 'Temperature')
+            ->where('wp_pins.pin', 'Humidity')
+            ->orWhere('wp_pins.pin', 'Temperature')
             ->orderByDesc('TS')
             ->limit('5')
             ->get();
@@ -47,13 +47,13 @@ class Reading extends Model
 
     public function getReadingsByUUID()
     {
-        return Reading::select('value', 'alias', 'relay_pin', 'plant_name')
+        return Reading::select('value', 'pin', 'relay_pin', 'alias')
         ->leftJoin('wp_pins', function ($join) {
             $join->on('wp_pins.id', '=', 'wp_readings.pin_id');
             $join->on('wp_pins.UUID', '=', DB::raw("'$this->uuid'"));
         })
-        ->where('alias', '=', 'Temperature')
-        ->orWhere('alias', '=', 'Humidity')
+        ->where('pin', '=', 'Temperature')
+        ->orWhere('pin', '=', 'Humidity')
         ->orderByDesc('TS')
         ->limit(2)
         ->get();
