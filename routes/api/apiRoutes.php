@@ -5,46 +5,45 @@ use \App\Models\Pin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    $readings = Reading::orderByDesc('TS')
-        ->limit(15)
-        ->get();
-    return $readings;
-});
-
+//Route for adding readings
 Route::post('/addreading', function () {
     if (!isset($_REQUEST['value']) or !isset($_REQUEST['pin']) or !isset($_REQUEST['uuid'])) {
         return;
     }
 
-    $id = DB::table('wp_pins')
-        ->select('wp_pins.id')
-        ->leftJoin('wp_plants', function ($join) {
-            $join->on('wp_pins.plant_name', '=', 'wp_plants.name')->orOn('wp_pins.plant_name', '=', 'wp_plants.location');
-            $join->on('wp_plants.harvest_date', '=', DB::raw("'0000-00-00'"));
-        })
-        ->where('uuid', $_REQUEST['uuid'])
-        ->where('pin', $_REQUEST['pin'])
-        ->value('id');
+    $pin = new Pin;
+    $pin->uuid = $_REQUEST['uuid'];
+    $pin->pin = $_REQUEST['pin'];
+
+    $id = $pin->getPinfromUUID();
 
     $result = DB::insert('insert into wp_readings (pin_id, value) values (?, ?)', [$id, $_REQUEST['value']]);
+
     return $result;
 });
 
-Route::post('/uploadpicture', function () {
-    $test = 'here2';
-    return $test;
+//Route for getting base amount of readings - 15 by default
+Route::get('/', function () {
+    return Reading::getReadingsByTS(15);
 });
 
+//Route for getting specified amount of readings
+Route::get('readings/{limit}', function ($limit) {
+    return Reading::getReadingsByTS($limit);
+});
+
+//Route for getting readings specifically for atmosphere
 Route::get('/atmosphere', function () {
     return Reading::atmosphere();
 });
 
+// Query routes for checking status of relays
 Route::get('/q/{uuid}', function ($uuid) {
     $id = Pin::where('uuid', $uuid)->first()->value('relay_pin');
     return exec("sudo /usr/bin/python3 /opt/scripts/relay-switcher.py $id query");
 });
 
+// Check routes for seeing if the fans should be on/off
 Route::get('/check', function () {
     $pins = Pin::select('plant_name', 'uuid')
         ->groupBy('uuid')
@@ -57,29 +56,26 @@ Route::get('/check', function () {
 });
 
 Route::get('/check/{uuid}', function ($uuid) {
-    $readings = DB::table('wp_readings')
-        ->select('value', 'alias', 'relay_pin', 'plant_name')
-        ->leftJoin('wp_pins', function ($join) use ($uuid) {
-            $join->on('wp_pins.id', '=', 'wp_readings.pin_id');
-            $join->on('wp_pins.UUID', '=', DB::raw("'$uuid'"));
-        })
-        ->where('alias', '=', 'Temperature')
-        ->orWhere('alias', '=', 'Humidity')
-        ->orderByDesc('TS')
-        ->limit(2)
-        ->get();
+    $readings = new Reading;
+    $readings->uuid = $uuid;
+    $readings = $readings->getReadingsByUUID();
 
     $setOn = null;
     $pin = null;
+
     $title = $readings[0]->plant_name;
+
     echo "<h1>Atmosphere for $title</h1>";
+
     foreach ($readings as $reading) {
+        $pin = $reading->relay_pin;
         if ($reading->alias == 'Temperature' and $reading->value > 90  or $reading->alias == 'Humidity' and $reading->value > 85) {
             $setOn = True;
-            $pin = $reading->relay_pin;
             echo "$reading->alias -> $reading->value <br />";
+        } elseif ($reading->alias == 'Temperature' and $reading->value < 73) {
+            $setOn = False;
+            echo "<strong>Temp under danger limit, $reading->value";
         } else {
-            $pin = $reading->relay_pin;
             echo "$reading->alias -> $reading->value <br />";
         }
     }
