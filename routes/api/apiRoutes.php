@@ -91,6 +91,6 @@ Route::get('/check/{uuid}', function ($uuid) {
 //UUID Routes
 Route::get('/uuid', function () {
   return Pin::select('uuid')
-  ->distinct
+  ->distinct()
   ->pluck('uuid');
 });
