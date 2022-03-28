@@ -50,7 +50,7 @@ Route::get('/check', function () {
         ->get();
     echo '<ul>';
     foreach ($pins as $pin) {
-        echo "<li><a href='/check/$pin->uuid'>$pin->plant_name</a></li>";
+        echo "<li><a href='/api/check/$pin->uuid'>$pin->plant_name</a></li>";
     }
     echo '</ul>';
 });
