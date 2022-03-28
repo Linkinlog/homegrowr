@@ -1,10 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use \App\Models\Pin;
 
 
 Route::get('/overview', function () {
-    return view('overview');
+    $data = [];
+    $pin = new Pin;
+    foreach (Pin::getUUIDs() as $row) {
+        $pin->uuid = $row->uuid;
+        $data .= $pin->getPinFromUUID();
+    }
+    return view('overview', $data);
 });
 
 

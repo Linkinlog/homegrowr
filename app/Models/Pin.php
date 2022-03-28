@@ -32,4 +32,11 @@ class Pin extends Model
         ->where('pin', $this->pin)
         ->value('id');
     }
+
+    public static function getUUIDs()
+    {
+        return Pin::select('uuid')
+        ->distinct()
+        ->pluck('uuid');
+    }
 }
