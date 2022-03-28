@@ -13,14 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-Route::get('/overview', function () {
-    return view('overview');
-});
+//Landing routes
+Route::prefix('/')->group(__DIR__.'/landing/landingRoutes.php');
 
 
-Route::get('/', function () {
-    return redirect('/overview');
-});
-
-
+//API routes
+Route::prefix('/api')->group(__DIR__.'/api/apiRoutes.php');
