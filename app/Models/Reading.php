@@ -36,17 +36,26 @@ class Reading extends Model
             ->get();
 
         return $readings;
+    }
 
-        // $readings = Reading::select('value', 'TS', 'alias')
-        //     ->join('wp_pins', function($join)
-        //     {
-        //         $join->on('wp_pins.alias', '=', DB::raw("'Humidity'"))
-        //         ->orOn('wp_pins.alias', '=', DB::raw("'Temperature'"));
-        //     })
-        //     ->orderByDesc('TS')
-        //     ->limit(45)
-        //     ->get();
-        // return $readings;
-        // return 'here';
+    public static function getReadingsByTS($limit)
+    {
+        return Reading::orderByDesc('TS')
+        ->limit($limit)
+        ->get();
+    }
+
+    public function getReadingsByUUID()
+    {
+        return Reading::select('value', 'alias', 'relay_pin', 'plant_name')
+        ->leftJoin('wp_pins', function ($join) {
+            $join->on('wp_pins.id', '=', 'wp_readings.pin_id');
+            $join->on('wp_pins.UUID', '=', DB::raw("'$this->uuid'"));
+        })
+        ->where('alias', '=', 'Temperature')
+        ->orWhere('alias', '=', 'Humidity')
+        ->orderByDesc('TS')
+        ->limit(2)
+        ->get();
     }
 }
