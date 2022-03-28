@@ -87,3 +87,10 @@ Route::get('/check/{uuid}', function ($uuid) {
         return "$pin Off ";
     }
 });
+
+//UUID Routes
+Route::get('/uuid', function () {
+  return Pin::select('uuid')
+  ->distinct
+  ->pluck('uuid');
+});
