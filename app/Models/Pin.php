@@ -21,18 +21,23 @@ class Pin extends Model
         'uuid'
     ];
 
-    public static function getPinfromUUID($uuid)
+    public static function getPinFromUUID($uuid, $pin = null)
     {
+        $self = new self;
+
         $id = Pin::select('wp_pins.id')
         ->leftJoin('wp_plants', function ($join) {
             $join->on('wp_pins.plant_name', '=', 'wp_plants.name')->orOn('wp_pins.plant_name', '=', 'wp_plants.location');
             $join->on('wp_plants.harvest_date', '=', DB::raw("'0000-00-00'"));
         })
         ->where('uuid', $uuid)
-        // ->where('pin', $this->pin)
+        ->when($pin, function($query, $pin) {
+            $query->where('pin', $pin);
+        })
         ->value('id');
-        $self = new self;
+
         $self->id = $id;
+        
         return $self;
     }
 

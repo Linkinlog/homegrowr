@@ -56,6 +56,7 @@ class Reading extends Model
         ->orWhere('pin', '=', 'Humidity')
         ->orderByDesc('TS')
         ->limit(2)
-        ->get();
+        ->get()
+        ->unique('pin');
     }
 }

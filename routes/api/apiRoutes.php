@@ -11,11 +11,10 @@ Route::post('/addreading', function () {
         return;
     }
 
-    $pin = new Pin;
-    $pin->uuid = $_REQUEST['uuid'];
-    $pin->pin = $_REQUEST['pin'];
+    $uuid = $_REQUEST['uuid'];
+    $pin = $_REQUEST['pin'];
 
-    $id = $pin->getPinfromUUID();
+    $id = Pin::getPinfromUUID($uuid, $pin)->id;
 
     $result = DB::insert('insert into wp_readings (pin_id, value) values (?, ?)', [$id, $_REQUEST['value']]);
 
@@ -45,17 +44,18 @@ Route::get('/q/{uuid}', function ($uuid) {
 
 // Check routes for seeing if the fans should be on/off
 Route::get('/check', function () {
-    $pins = Pin::select('plant_name', 'uuid')
+    $pins = Pin::select('alias', 'uuid')
         ->groupBy('uuid')
         ->get();
     echo '<ul>';
     foreach ($pins as $pin) {
-        echo "<li><a href='/api/check/$pin->uuid'>$pin->plant_name</a></li>";
+        echo "<li><a style='font-size:100px; padding: 7px;' href='/api/check/$pin->uuid'>$pin->alias</a></li>";
     }
     echo '</ul>';
 });
 
 Route::get('/check/{uuid}', function ($uuid) {
+    //TODO Reading::checkStats($uuid);
     $readings = new Reading;
     $readings->uuid = $uuid;
     $readings = $readings->getReadingsByUUID();
@@ -63,20 +63,19 @@ Route::get('/check/{uuid}', function ($uuid) {
     $setOn = null;
     $pin = null;
 
-    $title = $readings[0]->plant_name;
-
+    $title = $readings[0]->alias;
     echo "<h1>Atmosphere for $title</h1>";
 
     foreach ($readings as $reading) {
         $pin = $reading->relay_pin;
-        if ($reading->alias == 'Temperature' and $reading->value > 90  or $reading->alias == 'Humidity' and $reading->value > 85) {
+        if ($reading->pin == 'Temperature' and $reading->value > 90  or $reading->pin == 'Humidity' and $reading->value > 85) {
             $setOn = True;
-            echo "$reading->alias -> $reading->value <br />";
-        } elseif ($reading->alias == 'Temperature' and $reading->value < 73) {
+            echo "<h3>$reading->pin -> $reading->value <br /></h3>";
+        } elseif ($reading->pin == 'Temperature' and $reading->value < 73) {
             $setOn = False;
-            echo "<strong>Temp under danger limit, $reading->value";
+            echo "<h3><strong>Temp under danger limit, $reading->value</h3>";
         } else {
-            echo "$reading->alias -> $reading->value <br />";
+            echo "<h3>$reading->pin -> $reading->value <br /></h3>";
         }
     }
     if ($setOn) {
