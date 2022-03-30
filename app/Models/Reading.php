@@ -45,12 +45,12 @@ class Reading extends Model
         ->get();
     }
 
-    public function getReadingsByUUID()
+    public static function getReadingsByUUID($uuid)
     {
         return Reading::select('value', 'pin', 'relay_pin', 'alias')
-        ->leftJoin('wp_pins', function ($join) {
+        ->leftJoin('wp_pins', function ($join) use ($uuid) {
             $join->on('wp_pins.id', '=', 'wp_readings.pin_id');
-            $join->on('wp_pins.UUID', '=', DB::raw("'$this->uuid'"));
+            $join->on('wp_pins.UUID', '=', DB::raw("'$uuid'"));
         })
         ->where('pin', '=', 'Temperature')
         ->orWhere('pin', '=', 'Humidity')
