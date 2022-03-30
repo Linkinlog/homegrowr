@@ -56,9 +56,9 @@ Route::get('/check', function () {
 
 Route::get('/check/{uuid}', function ($uuid) {
     //TODO Reading::checkStats($uuid);
-    $readings = new Reading;
-    $readings->uuid = $uuid;
-    $readings = $readings->getReadingsByUUID();
+    // $readings = new Reading;
+    // $readings->uuid = $uuid;
+    $readings = Reading::getReadingsByUUID($uuid);
 
     $setOn = null;
     $pin = null;

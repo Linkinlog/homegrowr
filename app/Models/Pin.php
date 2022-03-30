@@ -35,6 +35,7 @@ class Pin extends Model
             $query->where('pin', $pin);
         })
         ->value('id');
+        // ->get();
 
         $self->id = $id;
         
@@ -43,14 +44,7 @@ class Pin extends Model
 
     public function get50()
     {
-        return Pin::where('id', $this->id)->readings()->limit(50)->get();
-    }
-
-    public function get50Formatted()
-    {
-        return [
-            $this->id => $this->get50()
-        ];
+        return $this->readings()->orderBy('wp_readings.TS', 'desc')->limit(50)->get();
     }
 
     public static function getUUIDs()
