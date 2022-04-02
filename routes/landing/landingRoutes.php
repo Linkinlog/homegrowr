@@ -1,18 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use \App\Models\Pin;
+use \App\Models\Sensors;
 
 
 Route::get('/overview', function () {
     $data = [];
-    // $pin = new Pin;
-    // foreach (Pin::getUUIDs() as $row) {
-        // $pin = Pin::getPinfromUUID($row);
-        // $data[$pin->id] = $pin->get50();
-        // $data .= $pin->getPinFromUUID();
+    // $sensor = new Sensors;
+    // foreach (Sensors::getUUIDs() as $row) {
+    // $sensor = Sensors::getSensorsfromUUID($row);
+    // $data[$sensor->id] = $sensor->get50();
+    // $data .= $sensor->getSensorsFromUUID();
     // }
-    return view('overview', $data);
+    return 'WIP';
+    // return view('overview', $data);
 });
 
 

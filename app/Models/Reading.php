@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Models\Pin;
+use App\Models\Sensors;
 
 
 class Reading extends Model
@@ -14,23 +14,23 @@ class Reading extends Model
      *
      * @var string
      */
-    protected $table = 'wp_readings';
+    protected $table = 'readings';
 
     protected $fillable = [
-        'pin_id',
+        'sensor_id',
         'value'
     ];
 
     public static function atmosphere()
     {
-        $pins = Pin::where('pin', 'Humidity')->orWhere('pin', 'Temperature')->get()->pluck('id');
+        $sensors = Sensors::where('type', 'Humidity')->orWhere('type', 'Temperature')->get()->pluck('id');
 
-        $readings = Reading::join('wp_pins', function ($join)
+        $readings = Reading::join('sensors', function ($join)
             {
-                $join->on('wp_readings.pin_id', 'wp_pins.id');
+            $join->on('readings.sensor_id', 'sensors.id');
             })
-            ->where('wp_pins.pin', 'Humidity')
-            ->orWhere('wp_pins.pin', 'Temperature')
+            ->where('sensors.type', 'Humidity')
+            ->orWhere('sensors.type', 'Temperature')
             ->orderByDesc('TS')
             ->limit('5')
             ->get();
@@ -47,16 +47,16 @@ class Reading extends Model
 
     public static function getReadingsByUUID($uuid)
     {
-        return Reading::select('value', 'pin', 'relay_pin', 'alias')
-        ->leftJoin('wp_pins', function ($join) use ($uuid) {
-            $join->on('wp_pins.id', '=', 'wp_readings.pin_id');
-            $join->on('wp_pins.UUID', '=', DB::raw("'$uuid'"));
+        return Reading::select('value', 'type', 'relay_pin', 'alias')
+        ->leftJoin('sensors', function ($join) use ($uuid) {
+            $join->on('sensors.id', 'readings.sensors_id');
+            $join->on('sensors.UUID', DB::raw("'$uuid'"));
         })
-        ->where('pin', '=', 'Temperature')
-        ->orWhere('pin', '=', 'Humidity')
+            ->where('type', 'Temperature')
+            ->orWhere('type', 'Humidity')
         ->orderByDesc('TS')
         ->limit(2)
         ->get()
-        ->unique('pin');
+        ->unique('type');
     }
 }
