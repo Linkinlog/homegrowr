@@ -17,7 +17,7 @@ class Reading extends Model
     protected $table = 'readings';
 
     protected $fillable = [
-        'sensor_id',
+        'sensors_id',
         'value'
     ];
 
@@ -27,7 +27,7 @@ class Reading extends Model
 
         $readings = Reading::join('sensors', function ($join)
             {
-            $join->on('readings.sensor_id', 'sensors.id');
+            $join->on('readings.sensors_id', 'sensors.id');
             })
             ->where('sensors.type', 'Humidity')
             ->orWhere('sensors.type', 'Temperature')
