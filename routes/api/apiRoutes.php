@@ -7,24 +7,35 @@ use Illuminate\Support\Facades\Route;
 
 //Route for adding readings
 Route::post('/addreading', function () {
-    if (!isset($_REQUEST['value']) or !isset($_REQUEST['type']) or !isset($_REQUEST['uuid'])) {
+    // TODO * change arduinio script to send type instead of pin and then change accordingly here
+    if (!isset($_REQUEST['value']) or !isset($_REQUEST['pin']) or !isset($_REQUEST['uuid'])) {
         return;
     }
-    // return $_REQUEST;
+    date_default_timezone_set("America/New_York");
+
     $uuid = $_REQUEST['uuid'];
-    $type = $_REQUEST['type'];
-    $plant_id = isset($_REQUEST['plant_id']) ? $_REQUEST['plant_id'] : 0;
+    $type = $_REQUEST['pin'];
+
+    $plant_id = $type !== 'soil' ? NULL : (isset($_REQUEST['plant_id']) ? $_REQUEST['plant_id'] : 0);
     $value = $_REQUEST['value'];
+
+    $ts = date('Y-m-d H:i:s');
+    $status = 1;
+
+    if (intval($value) == 0) {
+        $value = 0;
+        $status = 2;
+    }
 
     $id = Sensors::getSensorsfromUUID($uuid, $type)->id;
 
-    if ($id) {
-        $result = DB::insert('insert into readings (sensors_id, value) values (?, ?)', [$id, $value]);
-    } else {
-        DB::insert('insert into sensors (type, uuid, plant_id) values (?, ?, ?)', [$type, $uuid, $plant_id]);
-        $id = Sensors::getSensorsfromUUID($uuid, $type)->id;
-        $result = DB::insert('insert into readings (sensors_id, value) values (?, ?)', [$id, $value]);
+    if (!$id || intval($id) == 0) {
+        $id = DB::table('sensors')->insertGetId(
+            ['type' => $type, 'uuid' => $uuid, 'plant_id' => $plant_id, 'relay_pin' => 0]
+        );
     }
+
+    $result = DB::insert('insert into readings (sensors_id, value, status_id, TS) values (?, ?, ?, ?)', [$id, $value, $status, $ts]);
 
     return $result;
 });
