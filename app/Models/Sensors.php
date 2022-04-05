@@ -26,9 +26,11 @@ class Sensors extends Model
         $self = new self;
 
         $id = Sensors::select('sensors.id')
-        ->leftJoin('plants', function ($join) {
-            $join->on('sensors.plant_id', '=', 'plants.name')->orOn('sensors.plant_id', '=', 'plants.location');
-            $join->on('plants.harvest_date', '=', DB::raw("'0000-00-00'"));
+        ->when($type == 'soil', function ($query) {
+            $query->leftJoin('plants', function ($join) {
+                $join->on('sensors.plants_id', '=', 'plants.id');
+                $join->on('plants.harvest_date', '=', DB::raw("'0000-00-00'"));
+            });
         })
         ->where('uuid', $uuid)
         ->when($type, function($query, $type) {

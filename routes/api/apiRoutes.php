@@ -7,46 +7,84 @@ use Illuminate\Support\Facades\Route;
 
 
 //General Scaffolding for CRUD REST API
-
+/*
+Routes
+* GET /api/
+* POST /api/readings
+* GET /api/readings
+* GET /api/readings/atmosphere
+* GET /api/readings/{uuid}
+* GET /api/sensors
+* GET /api/sensors/uuids
+* GET /api/relay_pin/{uuid}
+*/
 
 //* Create {reading}
 
-Route::post('/reading', function () {
+/**
+ * * POST /api/reading
+ * 
+ * @param int $_REQUEST['value']
+ * @param text $_REQUEST['type']
+ * @param  varchar $_REQUEST['uuid']
+ *
+ * @return int / error
+ */
+Route::post('/readings', function () {
     if (!isset($_REQUEST['value']) or !isset($_REQUEST['type']) or !isset($_REQUEST['uuid'])) {
-        return;
+        return 0;
     }
+    date_default_timezone_set("America/New_York");
+
     $uuid = $_REQUEST['uuid'];
-    $type = $_REQUEST['type'];
-    $plant_id = isset($_REQUEST['plant_id']) ? $_REQUEST['plant_id'] : 0;
+    $type = strtolower($_REQUEST['type']);
+
+    $plant_id = $type !== 'soil' ? NULL : (isset($_REQUEST['plant_id']) ? $_REQUEST['plant_id'] : 0);
     $value = $_REQUEST['value'];
+
+    $ts = date('Y-m-d H:i:s');
+    $status = 1;
+
+    if (intval($value) == 0) {
+        $value = 0;
+        $status = 2;
+    }
 
     $id = Sensors::getSensorsfromUUID($uuid, $type)->id;
 
-    if ($id) {
-        $result = DB::insert('insert into readings (sensors_id, value) values (?, ?)', [$id, $value]);
-    } else {
-        DB::insert('insert into sensors (type, uuid, plant_id) values (?, ?, ?)', [$type, $uuid, $plant_id]);
-        $id = Sensors::getSensorsfromUUID($uuid, $type)->id;
-        $result = DB::insert('insert into readings (sensors_id, value) values (?, ?)', [$id, $value]);
+    if (!$id || intval($id) == 0) {
+        $id = DB::table('sensors')->insertGetId(
+            ['type' => $type, 'uuid' => $uuid, 'plant_id' => $plant_id, 'relay_pin' => 0]
+        );
     }
+
+    $result = DB::insert('insert into readings (sensors_id, value, status_id, TS) values (?, ?, ?, ?)', [$id, $value, $status, $ts]);
 
     return $result;
 });
-
 
 //* Create {sensor}
 
 //* Create {plant}
 
-
-
 //* Read {reading}
 
-//Route for getting base amount of readings - 15 by default
+/**
+ * * GET /api/
+ * 
+ * @return array base amount of readings, 15 by default
+ */
 Route::get('/', function () {
     return Reading::getReadingsByTS(15);
 });
 
+/**
+ * * GET /api/readings
+ * 
+ * @param int $_REQUEST['limit']
+ *
+ * @return array custom amount of readings, 10 by default
+ */
 Route::get('/readings', function () {
     if (isset($_REQUEST['limit'])) {
         $limit = $_REQUEST['limit'];
@@ -56,17 +94,26 @@ Route::get('/readings', function () {
     return Reading::getReadingsByTS($limit);
 });
 
-//Route for getting readings specifically for atmosphere
+/**
+ * * GET /api/readings/atmosphere
+ * 
+ * @return array readings specifically for atmosphere
+ */
 Route::get('/readings/atmosphere', function () {
     return Reading::atmosphere();
 });
 
-
-//Get readings for given sensor uuid
+/**
+ * * GET /api/readings/{uuid}
+ * 
+ * Get readings for given sensor uuid
+ * 
+ * @param  varchar $_REQUEST['uuid']
+ *
+ * @return string reading for the uuid 
+ */
 Route::get('/readings/{uuid}', function ($uuid) {
     //TODO Reading::checkStats($uuid);
-    // $readings = new Reading;
-    // $readings->uuid = $uuid;
     $readings = Reading::getReadingsByUUID($uuid);
 
     $setOn = null;
@@ -99,7 +146,15 @@ Route::get('/readings/{uuid}', function ($uuid) {
 
 //* Read {relay_pin}
 
-// Query routes for checking status of relays
+/**
+ * * GET /api/relay_pin/{uuid}
+ *
+ * Query routes for checking status of relays
+ * 
+ * @param  varchar $_REQUEST['uuid']
+ *
+ * @return string reading of relay
+ */
 Route::get('/relay_pin/{uuid}', function ($uuid) {
     $id = Sensors::where('uuid', $uuid)->first()->value('relay_pin');
     return exec("sudo /usr/bin/python3 /opt/scripts/relay-switcher.py $id query");
@@ -107,7 +162,11 @@ Route::get('/relay_pin/{uuid}', function ($uuid) {
 
 //* Read {sensors}
 
-// Check routes for seeing if the fans should be on/off
+/**
+ * * POST /api/sensors
+ * 
+ * @return html list of sensors and their hyperlinks
+ */
 Route::get('/sensors', function () {
     $sensors = Sensors::select('alias', 'uuid')
         ->groupBy('uuid')
@@ -119,22 +178,24 @@ Route::get('/sensors', function () {
     echo '</ul>';
 });
 
-//Query all UUIDs
+/**
+ * * GET /api/sensors/uuids
+ * 
+ * Query all UUIDs
+ * 
+ * @return array all active uuids
+ */
 Route::get('/sensors/uuids', function () {
     return Sensors::getUUIDs();
 });
 
 //* Read {plant}
 
-
-
 //* Update {reading}
 
 //* Update {sensor}
 
 //* Update {plant}
-
-
 
 //* Delete {reading}
 
