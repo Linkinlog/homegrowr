@@ -1,6 +1,7 @@
 <?php
 
 use \App\Models\Reading;
+use \App\Models\Plants;
 use \App\Models\Sensors;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 /*
 Routes
 * GET /api/
+* GET /api/status
 * POST /api/readings
 * GET /api/readings
 * GET /api/readings/atmosphere
@@ -19,11 +21,28 @@ Routes
 * GET /api/relay_pin/{uuid}
 */
 
+//Status
+/**
+ * * GET /api/status
+ *
+ * @return html list of sensors and their hyperlinks
+ */
+Route::get('/status', function () {
+    $sensors = Sensors::select('alias', 'uuid')
+        ->groupBy('uuid')
+        ->get();
+    echo '<ul>';
+    foreach ($sensors as $sensor) {
+        echo "<li><a style='font-size:100px; padding: 7px;' href='/api/readings/$sensor->uuid'>$sensor->alias</a></li>";
+    }
+    echo '</ul>';
+});
+
 //* Create {reading}
 
 /**
  * * POST /api/reading
- * 
+ *
  * @param int $_REQUEST['value']
  * @param text $_REQUEST['type']
  * @param  varchar $_REQUEST['uuid']
@@ -64,6 +83,17 @@ Route::post('/readings', function () {
 });
 
 //* Create {sensor}
+Route::post('/sensor', function () {
+    if (!isset($_REQUEST['type']) || !isset($_REQUEST['uuid'])) {
+        return;
+    }
+    $sensor = new Sensors;
+    $sensor->type = strtolower($_REQUEST['type']);
+    $sensor->uuid = $_REQUEST['uuid'];
+    $sensor->plant_id = isset($_REQUEST['plant_id']) ? intval($_REQUEST['plant_id']) : 0;
+    $sensor->relay_pin = isset($_REQUEST['relay_pin']) ? intval($_REQUEST['relay_pin']) : 0;
+    $sensor->save();
+});
 
 //* Create {plant}
 
@@ -71,7 +101,7 @@ Route::post('/readings', function () {
 
 /**
  * * GET /api/
- * 
+ *
  * @return array base amount of readings, 15 by default
  */
 Route::get('/', function () {
@@ -80,7 +110,7 @@ Route::get('/', function () {
 
 /**
  * * GET /api/readings
- * 
+ *
  * @param int $_REQUEST['limit']
  *
  * @return array custom amount of readings, 10 by default
@@ -96,7 +126,7 @@ Route::get('/readings', function () {
 
 /**
  * * GET /api/readings/atmosphere
- * 
+ *
  * @return array readings specifically for atmosphere
  */
 Route::get('/readings/atmosphere', function () {
@@ -105,9 +135,9 @@ Route::get('/readings/atmosphere', function () {
 
 /**
  * * GET /api/readings/{uuid}
- * 
+ *
  * Get readings for given sensor uuid
- * 
+ *
  * @param  varchar $_REQUEST['uuid']
  *
  * @return string reading for the uuid 
@@ -150,7 +180,7 @@ Route::get('/readings/{uuid}', function ($uuid) {
  * * GET /api/relay_pin/{uuid}
  *
  * Query routes for checking status of relays
- * 
+ *
  * @param  varchar $_REQUEST['uuid']
  *
  * @return string reading of relay
@@ -163,26 +193,19 @@ Route::get('/relay_pin/{uuid}', function ($uuid) {
 //* Read {sensors}
 
 /**
- * * POST /api/sensors
- * 
- * @return html list of sensors and their hyperlinks
+ * * GET /api/sensors
+ *
+ * Query all sensors
  */
 Route::get('/sensors', function () {
-    $sensors = Sensors::select('alias', 'uuid')
-        ->groupBy('uuid')
-        ->get();
-    echo '<ul>';
-    foreach ($sensors as $sensor) {
-        echo "<li><a style='font-size:100px; padding: 7px;' href='/api/readings/$sensor->uuid'>$sensor->alias</a></li>";
-    }
-    echo '</ul>';
+    return Sensors::limit('50')->get();
 });
 
 /**
  * * GET /api/sensors/uuids
- * 
+ *
  * Query all UUIDs
- * 
+ *
  * @return array all active uuids
  */
 Route::get('/sensors/uuids', function () {
@@ -190,6 +213,15 @@ Route::get('/sensors/uuids', function () {
 });
 
 //* Read {plant}
+
+/**
+ * * GET /api/plants
+ *
+ * @return array plants
+ */
+Route::get('/plants', function () {
+    return Plants::limit('50')->get();
+});
 
 //* Update {reading}
 

@@ -14,6 +14,8 @@ class Sensors extends Model
      */
     protected $table = 'sensors';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'type',
         'alias',
