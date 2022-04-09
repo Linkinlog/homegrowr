@@ -19,7 +19,7 @@ class Sensors extends Model
     protected $fillable = [
         'type',
         'alias',
-        'plant_id',
+        'plants_id',
         'uuid'
     ];
 
@@ -27,7 +27,7 @@ class Sensors extends Model
     {
         $self = new self;
 
-        $id = Sensors::select('sensors.id')
+        $id = Self::select('sensors.id')
         ->when($type == 'soil', function ($query) {
             $query->leftJoin('plants', function ($join) {
                 $join->on('sensors.plants_id', '=', 'plants.id');

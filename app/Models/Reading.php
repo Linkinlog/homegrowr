@@ -18,7 +18,8 @@ class Reading extends Model
 
     protected $fillable = [
         'sensors_id',
-        'value'
+        'value',
+        'status_id'
     ];
 
     public static function atmosphere()
@@ -47,16 +48,65 @@ class Reading extends Model
 
     public static function getReadingsByUUID($uuid)
     {
-        return Reading::select('value', 'type', 'relay_pin', 'alias')
-        ->leftJoin('sensors', function ($join) use ($uuid) {
-            $join->on('sensors.id', 'readings.sensors_id');
-            $join->on('sensors.UUID', DB::raw("'$uuid'"));
-        })
-            ->where('type', 'Temperature')
-            ->orWhere('type', 'Humidity')
-        ->orderByDesc('TS')
-        ->limit(2)
-        ->get()
-        ->unique('type');
+        isset($_REQUEST['type']) ? $type = $_REQUEST['type'] : $type = NULL;
+        return Reading::select('readings.id', 'value', 'type', 'relay_pin', 'alias', 'created_at')
+            ->leftJoin('sensors', function ($join) use ($uuid) {
+                $join->on('sensors.id', 'readings.sensors_id');
+                $join->on('sensors.UUID', DB::raw("'$uuid'"));
+            })
+            ->when($type, function ($query) use ($type){
+                $query->where('type',$type);
+            }, function ($query) {
+                $query->where('type', 'Temperature');
+                $query->orWhere('type', 'Humidity');
+            })
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get();
+    }
+
+    public static function checkAll()
+    {
+        $uuids = Sensors::select('uuid')
+            ->distinct()
+            ->pluck('uuid');
+        foreach ($uuids as $uuid) {
+            echo Self::check($uuid);
+        }
+    }
+
+    //TODO Remove the user-friendly-ness of this route once we can see it with Vue/Chartjs
+    public static function check($uuid)
+    {
+        if (count($readings = Reading::getReadingsByUUID($uuid)) < 1) {
+            return false;
+        }
+        $setOn = null;
+        $pin = null;
+        $test = count($readings);
+
+        $title = $readings[0]->alias;
+        echo "<h1>Atmosphere for $title</h1>";
+
+        foreach ($readings as $reading) {
+            $pin = $reading->relay_pin;
+            if ($reading->type == 'Temperature' and $reading->value > 90  or $reading->type == 'Humidity' and $reading->value > 85) {
+                $setOn = True;
+                echo "<h3>$reading->type -> $reading->value <br /></h3>";
+            } elseif ($reading->type == 'Temperature' and $reading->value < 73) {
+                $setOn = False;
+                echo "<h3><strong>Temp under danger limit, $reading->value</h3>";
+            } else {
+                echo "<h3>$reading->type -> $reading->value <br /></h3>";
+            }
+        }
+        if ($setOn) {
+            exec("sudo /usr/bin/python3 /opt/scripts/relay-switcher.py $pin HIGH");
+            return "$pin On ";
+        } else {
+            exec("sudo /usr/bin/python3 /opt/scripts/relay-switcher.py $pin LOW");
+            return "$pin Off ";
+        }
+
     }
 }
