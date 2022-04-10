@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Sensors;
-
+use Carbon\Carbon;
 
 class Reading extends Model
 {
@@ -49,7 +49,7 @@ class Reading extends Model
     public static function getReadingsByUUID($uuid)
     {
         isset($_REQUEST['type']) ? $type = $_REQUEST['type'] : $type = NULL;
-        return Reading::select('readings.id', 'value', 'type', 'relay_pin', 'alias', 'created_at')
+        $reading = Reading::select('value', 'updated_at', 'type')
             ->leftJoin('sensors', function ($join) use ($uuid) {
                 $join->on('sensors.id', 'readings.sensors_id');
                 $join->on('sensors.UUID', DB::raw("'$uuid'"));
@@ -60,9 +60,21 @@ class Reading extends Model
                 $query->where('type', 'Temperature');
                 $query->orWhere('type', 'Humidity');
             })
-            ->orderByDesc('created_at')
-            ->limit(10)
-            ->get();
+            ->orderByDesc('updated_at')
+            ->limit(10);
+        $reading = $reading->get()->toJson();
+        return "{\"$uuid\":$reading}";
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        $date = Carbon::parse($value);
+        return $date->format('Y-m-d H:i');
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        $date = Carbon::parse($value);
+        return $date->format('Y/m/d');
     }
 
     public static function checkAll()
