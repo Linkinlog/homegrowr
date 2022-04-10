@@ -1,7 +1,5 @@
 @extends('layouts.layout')
 
 @section('content')
-{{ json_decode($data) }}
-hi
-
+<example-component></example-component>
 @endsection

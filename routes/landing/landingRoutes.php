@@ -12,8 +12,8 @@ Route::get('/overview', function () {
     // $data[$sensor->id] = $sensor->get50();
     // $data .= $sensor->getSensorsFromUUID();
     // }
-    return 'WIP';
-    // return view('overview', $data);
+    // return 'WIP';
+    return view('overview');
 });
 
 
