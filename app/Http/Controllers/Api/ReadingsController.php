@@ -45,12 +45,12 @@ class ReadingsController extends Controller
      */
     public function store(Request $request)
     {
-        if (!isset($request['value']) or !isset($request['pin']) or !isset($request['uuid'])) {
+        if (!isset($request['value']) or !isset($request['type']) or !isset($request['uuid'])) {
             return 0;
         }
 
         $uuid = $request['uuid'];
-        $type = strtolower($request['pin']);
+        $type = strtolower($request['type']);
 
         $plants_id = $type !== 'soil' ? NULL : (isset($request['plants_id']) ? $request['plants_id'] : 0);
         $value = $request['value'];
