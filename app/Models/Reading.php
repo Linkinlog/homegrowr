@@ -32,7 +32,7 @@ class Reading extends Model
             })
             ->where('sensors.type', 'humidity')
             ->orWhere('sensors.type', 'temperature')
-            ->orderByDesc('TS')
+            ->orderByDesc('updated_at')
             ->limit('5')
             ->get();
 
@@ -41,7 +41,7 @@ class Reading extends Model
 
     public static function getReadingsByTS($limit)
     {
-        return Reading::orderByDesc('TS')
+        return Reading::orderByDesc('updated_at')
         ->limit($limit)
         ->get();
     }

@@ -57,7 +57,7 @@ class Sensors extends Model
 
     public function get50()
     {
-        return $this->readings()->orderBy('readings.TS', 'desc')->limit(50)->get();
+        return $this->readings()->orderBy('readings.updated_at', 'desc')->limit(50)->get();
     }
 
     public static function getUUIDsAndName()
