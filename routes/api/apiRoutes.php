@@ -129,6 +129,17 @@ Route::get('/sensors/uuids', function () {
     return Sensors::getUUIDs();
 });
 
+/**
+ * * GET /api/sensors/name
+ *
+ * Return alias based off the uuid given
+ *
+ * @return array all active uuids
+ */
+Route::get('/sensors/name/{uuid}', function ($uuid) {
+    return Sensors::getNameFromUUID($uuid);
+});
+
 //* Read {plant}
 
 /**
