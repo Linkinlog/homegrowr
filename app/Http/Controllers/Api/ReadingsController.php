@@ -45,12 +45,13 @@ class ReadingsController extends Controller
      */
     public function store(Request $request)
     {
-        if (!isset($request['value']) or !isset($request['pin']) or !isset($request['uuid'])) {
+        if (!isset($request['value']) or !isset($request['type']) or !isset($request['uuid'])) {
             return 0;
         }
+        date_default_timezone_set("America/New_York");
 
         $uuid = $request['uuid'];
-        $type = strtolower($request['pin']);
+        $type = strtolower($request['type']);
 
         $plants_id = $type !== 'soil' ? NULL : (isset($request['plants_id']) ? $request['plants_id'] : 0);
         $value = $request['value'];
@@ -62,7 +63,7 @@ class ReadingsController extends Controller
             $status = 2;
         }
 
-        $sensor_id = Sensors::getSensorsfromUUID($uuid, $type)->sensor_id;
+        $sensor_id = Sensors::getSensorsfromUUID($uuid, $type)->id;
 
         if (!$sensor_id || intval($sensor_id) == 0) {
             $sensor_id = new Sensors;
