@@ -8,7 +8,6 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css')}}">
-        <script defer src="{{ mix('js/app.js') }}"></script>
 
 
     </head>

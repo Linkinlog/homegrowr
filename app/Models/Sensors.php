@@ -46,25 +46,9 @@ class Sensors extends Model
         return $self;
     }
 
-    public static function getNameFromUUID($uuid, $type = NULL)
-    {
-        return Self::where('uuid', $uuid)
-            ->when($type, function ($query) use ($type) {
-                $query->where('type', $type);
-            })
-            ->value('alias');
-    }
-
     public function get50()
     {
-        return $this->readings()->orderBy('readings.updated_at', 'desc')->limit(50)->get();
-    }
-
-    public static function getUUIDsAndName()
-    {
-        return Sensors::select('uuid', 'alias')
-            ->distinct()
-            ->get();
+        return $this->readings()->orderBy('readings.TS', 'desc')->limit(50)->get();
     }
 
     public static function getUUIDs()
