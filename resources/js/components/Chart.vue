@@ -20,7 +20,7 @@
         mounted () {
             Vue.nextTick(() => {
                 axios
-                .get("/api/readings/" + this.uuid)
+                .get('/api/readings/' + this.uuid + '/?temperature=true')
                 .then(response => (this.info = response.data))
             })
         },

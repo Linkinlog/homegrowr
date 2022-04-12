@@ -92,7 +92,7 @@ class ReadingsController extends Controller
      */
     public function show(Request $request, string $uuid)
     {
-        return Reading::getReadingsByUUID($uuid);
+        return Reading::getReadingsByUUID($uuid, $request->has('temperature') ?: true);
     }
 
     /**

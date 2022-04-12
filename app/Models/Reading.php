@@ -81,7 +81,7 @@ class Reading extends Model
             }
         }
         
-        if ($formatted) {
+        if (!$formatted) {
             return $readings;
         } else {
             return $arr;
