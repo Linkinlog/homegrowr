@@ -20,7 +20,8 @@ class Sensors extends Model
         'type',
         'alias',
         'plants_id',
-        'uuid'
+        'uuid',
+        'ipaddr'
     ];
 
     public static function getSensorsFromUUID($uuid, $type = null)
