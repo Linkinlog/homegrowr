@@ -68,7 +68,10 @@ class Reading extends Model
                 $query->orWhere('type', 'humidity');
             })
             ->orderByDesc('updated_at')
-            ->limit(20);
+            ->whereRaw('updated_at between
+            (select date(updated_at) from readings where updated_at < current_date()
+             order by updated_at desc limit 1) and now()')
+            ->limit(1000);
         $readings = $readings->get();
 
         // Go over each reading and put it into a friendly vue(haha) for our front end charts
