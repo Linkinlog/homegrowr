@@ -15,10 +15,7 @@
                     <div class="card">
                         <div class="card-header text-center">{{ $cameras[$i]['alias'] }}</div>
                         <div class="card-body">
-                            <img width="100%" height="100%" src="/test" alt="webcam"></img>
-                            <video control type="video/mpeg4">
-                                <source src="/videos/?ip={{ urlencode($cameras[$i]['ipaddr']) }}">
-                            </video>
+                            <img src="/videos/?ip={{ urlencode($cameras[$i]['ipaddr']) }}" />
                         </div>
                     </div>
                 </div>

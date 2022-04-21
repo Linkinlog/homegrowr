@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use \App\Models\Sensors;
+use Illuminate\Http\Request;
 
 Route::get('/overview', function () {
     $atmosphere = Sensors::getUUIDsAndName('atmosphere');
@@ -10,8 +11,8 @@ Route::get('/overview', function () {
 });
 
 
-Route::get('/videos/{$ip}', function ($ip) {
-    $server = $ip;
+Route::get('/videos/', function (Request $request) {
+    $server = isset($request['ip']) ? $request['ip'] : '';
     $url = "/mjpeg/1";
     set_time_limit(0);
     $fp = fsockopen($server, 80, $errno, $errstr, 30);
