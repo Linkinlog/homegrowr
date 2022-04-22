@@ -57,16 +57,22 @@ Route::controller(ReadingsController::class)->group(function ()
 });
 
 //TODO Copy crud functionality for the other models
-//* Create {sensor}
-Route::post('/sensor', function () {
+//* Create {sensors}
+Route::post('/sensors', function () {
     if (!isset($_REQUEST['type']) || !isset($_REQUEST['uuid'])) {
         return;
     }
-    $sensor = new Sensors;
-    $sensor->type = strtolower($_REQUEST['type']);
-    $sensor->uuid = $_REQUEST['uuid'];
+    $uuid = $_REQUEST['uuid'];
+    $type = strtolower($_REQUEST['type']);
+    $sensor = Sensors::find(Sensors::getSensorsfromUUID($uuid, $type)->id) ?? new Sensors;
+    // $sensor = new Sensors;
+    $sensor->type = $type;
+    $sensor->uuid = $uuid;
     $sensor->plants_id = isset($_REQUEST['plants_id']) ? intval($_REQUEST['plants_id']) : 0;
     $sensor->relay_pin = isset($_REQUEST['relay_pin']) ? intval($_REQUEST['relay_pin']) : 0;
+    if ($_REQUEST['ipaddr']) {
+        $sensor->ipaddr = isset($_REQUEST['ipaddr']) ? $_REQUEST['ipaddr'] : 0;
+    }
     $sensor->save();
 });
 

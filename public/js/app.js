@@ -5278,6 +5278,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -5288,12 +5289,12 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     Vue.nextTick(function () {
-      axios.get("/api/readings/" + _this.uuid).then(function (response) {
+      axios.get("/api/readings/" + _this.uuid + "/?temperature=true").then(function (response) {
         return _this.info = response.data;
       });
     });
   },
-  props: ['uuid', 'name']
+  props: ["uuid", "name"]
 });
 
 /***/ }),
@@ -32690,16 +32691,14 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "card" },
-    [
-      _c("div", { staticClass: "card-header text-center" }, [
-        _vm._v(_vm._s(_vm.name)),
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "card-body" }),
-      _vm._v(" "),
+  return _c("div", { staticClass: "card" }, [
+    _c("div", { staticClass: "card-header text-center" }, [
+      _vm._v(_vm._s(_vm.name)),
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "card-body" },
       _vm._l(_vm.info, function (value, name) {
         return _c(
           "div",
@@ -32710,13 +32709,22 @@ var render = function () {
             ]),
             _vm._v(" "),
             _c("area-chart", { attrs: { data: value } }),
+            _vm._v(" "),
+            _c("h5", [
+              _vm._v(
+                "Current value : " +
+                  _vm._s(value[0][1]) +
+                  " / Time : " +
+                  _vm._s(value[0][0])
+              ),
+            ]),
           ],
           1
         )
       }),
-    ],
-    2
-  )
+      0
+    ),
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true

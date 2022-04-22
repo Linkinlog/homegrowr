@@ -52,6 +52,7 @@ class ReadingsController extends Controller
 
         $uuid = $request['uuid'];
         $type = strtolower($request['type']);
+        $ip = $request['ipaddr'] ?? NULL;
 
         $plants_id = $type !== 'soil' ? NULL : (isset($request['plants_id']) ? $request['plants_id'] : 0);
         $value = $request['value'];
@@ -62,11 +63,14 @@ class ReadingsController extends Controller
             $value = 0;
             $status = 2;
         }
-
+    // TODO Cache IP and check if the sent IP is changed, if so do an update on the sensor
         $sensor_id = Sensors::getSensorsfromUUID($uuid, $type)->id;
-
+        
         if (!$sensor_id || intval($sensor_id) == 0) {
             $sensor_id = new Sensors;
+            if ($ip !== NULL) {
+                $sensor_id->ipaddr = $ip;
+            }
             $sensor_id->type = $type;
             $sensor_id->uuid = $uuid;
             $sensor_id->plants_id = $plants_id;

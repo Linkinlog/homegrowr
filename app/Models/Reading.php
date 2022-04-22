@@ -99,7 +99,7 @@ class Reading extends Model
     public function getUpdatedAtAttribute($value)
     {
         $date = Carbon::parse($value);
-        return $date->format('Y-m-d h:i:s');
+        return $date->format('Y-m-d H:i:s');
     }
 
     public static function checkAll()

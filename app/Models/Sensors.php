@@ -20,7 +20,8 @@ class Sensors extends Model
         'type',
         'alias',
         'plants_id',
-        'uuid'
+        'uuid',
+        'ipaddr'
     ];
 
     public static function getSensorsFromUUID($uuid, $type = null)
@@ -60,11 +61,22 @@ class Sensors extends Model
         return $this->readings()->orderBy('readings.updated_at', 'desc')->limit(50)->get();
     }
 
-    public static function getUUIDsAndName()
+    public static function getUUIDsAndName($type = NULL)
     {
-        return Sensors::select('uuid', 'alias')
-            ->distinct()
-            ->get();
+        $sensor = Sensors::select('uuid', 'alias')
+            ->when(isset($type), function ($query) use ($type) {
+                if ($type == 'atmosphere') {
+                    $query->where('type', 'temperature');
+                    $query->orWhere('type', 'humidity');
+                } elseif ($type == 'camera') {
+                    $query->select('ipaddr', 'alias');
+                    $query->where('type', 'camera');
+                }
+            })
+            ->distinct();
+
+        return
+            $sensor->get();
     }
 
     public static function getUUIDs()
