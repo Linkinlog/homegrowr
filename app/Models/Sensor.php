@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Sensors extends Model
+class Sensor extends Model
 {
     /**
      * The table associated with the model.
@@ -19,19 +19,19 @@ class Sensors extends Model
     protected $fillable = [
         'type',
         'alias',
-        'plants_id',
+        'plant_id',
         'uuid',
         'ipaddr'
     ];
 
-    public static function getSensorsFromUUID($uuid, $type = null)
+    public static function getSensorFromUUID($uuid, $type = null)
     {
         $self = new self;
 
         $id = Self::select('sensors.id')
         ->when($type == 'soil', function ($query) {
             $query->leftJoin('plants', function ($join) {
-                $join->on('sensors.plants_id', '=', 'plants.id');
+                $join->on('sensors.plant_id', '=', 'plants.id');
                 $join->on('plants.harvest_date', '=', DB::raw("'0000-00-00'"));
             });
         })
@@ -63,7 +63,7 @@ class Sensors extends Model
 
     public static function getUUIDsAndName($type = NULL)
     {
-        $sensor = Sensors::select('uuid', 'alias')
+        $sensor = Sensor::select('uuid', 'alias')
             ->when(isset($type), function ($query) use ($type) {
                 if ($type == 'atmosphere') {
                     $query->where('type', 'temperature');
@@ -81,7 +81,7 @@ class Sensors extends Model
 
     public static function getUUIDs()
     {
-        return Sensors::select('uuid')
+        return Sensor::select('uuid')
         ->distinct()
         ->pluck('uuid');
     }
