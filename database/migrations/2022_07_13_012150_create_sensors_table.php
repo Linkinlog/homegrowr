@@ -11,17 +11,17 @@ class CreateSensorsTable extends Migration
      *
      * @return void
      */
-    // id	`type`	alias	plants_id	UUID	relay_pin	ipaddr
+    // id	`type`	alias	plant_id	UUID	relay_pin	ipaddr
     public function up()
     {
         Schema::create('sensors', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->string('type', 50);
-            $table->string('alias', 100);
-            $table->foreignId('plants_id');
-            $table->uuid('uuid');
-            $table->foreignId('relay_pins_id');
-            $table->ipAddress('ipaddr');
+            $table->string('type', 50)->nullable();
+            $table->string('alias', 100)->nullable();
+            $table->foreignId('plant_id')->nullable();
+            $table->uuid('uuid')->nullable();
+            $table->foreignId('relay_pins_id')->nullable();
+            $table->ipAddress('ipaddr')->nullable();
             $table->timestamps();
         });
     }

@@ -13,12 +13,12 @@ class CreateReadingsTable extends Migration
      */
     public function up()
     {
-        // id	sensors_id	value	status_id	TS	updated_at	created_at
+        // id	sensor_id	value	status_id	TS	updated_at	created_at
         Schema::create('readings', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->foreignId('sensors_id');
-            $table->unsignedDecimal('value', 16, 4);
-            $table->foreignId('status_id');
+            $table->foreignId('sensor_id')->nullable();
+            $table->unsignedDecimal('value', 16, 4)->nullable();
+            $table->foreignId('status_id')->nullable();
             $table->timestamps();
         });
     }

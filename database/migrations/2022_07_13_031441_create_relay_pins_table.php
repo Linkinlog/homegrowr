@@ -15,7 +15,8 @@ class CreateRelayPinsTable extends Migration
     {
         Schema::create('relay_pins', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->integer('relay');
+            $table->integer('relay')->nullable();
+            $table->timestamps();
         });
     }
 

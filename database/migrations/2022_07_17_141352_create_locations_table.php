@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePlantsTable extends Migration
+class CreateLocationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreatePlantsTable extends Migration
      */
     public function up()
     {
-        // id	name	plant_date	location	harvest_date
-        Schema::create('plants', function (Blueprint $table) {
+        Schema::create('locations', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->string('name', 50)->nullable();
-            $table->date('plant_date')->nullable();
-            $table->string('location', 100)->nullable();
-            $table->date('harvest_date')->nullable();
+            $table->string('alias')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +27,6 @@ class CreatePlantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plants');
+        Schema::dropIfExists('locations');
     }
 }
