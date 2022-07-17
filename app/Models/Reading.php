@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Sensor;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Reading extends Model
 {
@@ -15,6 +16,8 @@ class Reading extends Model
      * @var string
      */
     protected $table = 'readings';
+
+    use HasFactory;
 
     protected $fillable = [
         'sensor_id',
@@ -134,5 +137,26 @@ class Reading extends Model
             return "$pin Off ";
         }
 
+    }
+
+
+    /**
+     * Defines the relationship between the reading and its sensor
+     *
+     * @return void | relationship
+     */
+    public function sensor()
+    {
+        return $this->belongsTo(Sensor::class);
+    }
+    
+    /**
+     * Defines the relationship between the reading and its status
+     *
+     * @return void | relationship
+     */
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
     }
 }
