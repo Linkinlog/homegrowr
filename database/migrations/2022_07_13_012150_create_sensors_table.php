@@ -16,11 +16,9 @@ class CreateSensorsTable extends Migration
     {
         Schema::create('sensors', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->string('type', 50)->nullable();
             $table->string('alias', 100)->nullable();
-            $table->foreignId('plant_id')->nullable();
             $table->uuid('uuid')->nullable();
-            $table->foreignId('relay_pins_id')->nullable();
+            $table->foreignId('location_id')->nullable();
             $table->ipAddress('ipaddr')->nullable();
             $table->timestamps();
         });
