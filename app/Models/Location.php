@@ -15,4 +15,9 @@ class Location extends Model
      * @var string
      */
     protected $table = 'locations';
+
+
+    protected $fillable = [
+        'alias'
+    ];
 }
