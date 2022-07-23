@@ -1,8 +1,12 @@
 <?php
- 
+
 namespace App\Models;
- 
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Sensor extends Model
@@ -14,8 +18,6 @@ class Sensor extends Model
      */
     protected $table = 'sensors';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'type',
         'alias',
@@ -24,26 +26,28 @@ class Sensor extends Model
         'ipaddr'
     ];
 
+    use HasFactory;
+
     public static function getSensorFromUUID($uuid, $type = null)
     {
         $self = new self;
 
         $id = Self::select('sensors.id')
-        ->when($type == 'soil', function ($query) {
-            $query->leftJoin('plants', function ($join) {
-                $join->on('sensors.plant_id', '=', 'plants.id');
-                $join->on('plants.harvest_date', '=', DB::raw("'0000-00-00'"));
-            });
-        })
-        ->where('uuid', $uuid)
-        ->when($type, function($query, $type) {
-            $query->where('type', $type);
-        })
-        ->value('id');
+            ->when($type == 'soil', function ($query) {
+                $query->leftJoin('plants', function ($join) {
+                    $join->on('sensors.plant_id', '=', 'plants.id');
+                    $join->on('plants.harvest_date', '=', DB::raw("'0000-00-00'"));
+                });
+            })
+            ->where('uuid', $uuid)
+            ->when($type, function ($query, $type) {
+                $query->where('type', $type);
+            })
+            ->value('id');
         // ->get();
 
         $self->id = $id;
-        
+
         return $self;
     }
 
@@ -79,15 +83,40 @@ class Sensor extends Model
             $sensor->get();
     }
 
-    public static function getUUIDs()
+    public static function getUUIDs(): Sensor
     {
         return Sensor::select('uuid')
-        ->distinct()
-        ->pluck('uuid');
+            ->distinct()
+            ->pluck('uuid');
     }
 
-    public function readings()
+    /** @var Reading $readings */
+    public function readings(): HasMany
     {
         return $this->hasMany(Reading::class);
+    }
+
+    /** @var Plant $plants */
+    public function plants(): BelongsToMany
+    {
+        return $this->belongsToMany(Plant::class);
+    }
+
+    /** @var Location $locations */
+    public function locations(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    /** @var Type $types */
+    public function types(): BelongsToMany
+    {
+        return $this->belongsToMany(Type::class);
+    }
+
+    /** @var Relay_pin $relays */
+    public function relays(): BelongsToMany
+    {
+        return $this->belongsToMany(Relay::class);
     }
 }
