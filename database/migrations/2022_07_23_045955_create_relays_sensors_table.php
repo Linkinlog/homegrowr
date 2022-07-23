@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTypesSensorsTable extends Migration
+class CreateRelaysSensorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateTypesSensorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('types_sensors_pivot', function (Blueprint $table) {
+        Schema::create('relay_sensor', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->foreignId('types_id');
-            $table->foreignId('sensors_id');
-            $table->timestamps();
+            $table->foreignId('relay_id');
+            $table->foreignId('sensor_id');
         });
     }
 
@@ -28,6 +27,6 @@ class CreateTypesSensorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('types_sensors');
+        Schema::dropIfExists('relay_sensors');
     }
 }

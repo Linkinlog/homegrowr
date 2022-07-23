@@ -19,11 +19,11 @@ class Sensor extends Model
     protected $table = 'sensors';
 
     protected $fillable = [
-        'type',
         'alias',
         'plant_id',
         'uuid',
-        'ipaddr'
+        'ipaddr',
+        'location_id'
     ];
 
     use HasFactory;
@@ -111,10 +111,10 @@ class Sensor extends Model
     /** @var Type $types */
     public function types(): BelongsToMany
     {
-        return $this->belongsToMany(Type::class);
+        return $this->belongsToMany(Type::class, 'type_sensor');
     }
 
-    /** @var Relay_pin $relays */
+    /** @var Relay $relays */
     public function relays(): BelongsToMany
     {
         return $this->belongsToMany(Relay::class);
