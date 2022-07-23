@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRelayPinsTable extends Migration
+class CreateRelaysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateRelayPinsTable extends Migration
      */
     public function up()
     {
-        Schema::create('relay_pins', function (Blueprint $table) {
+        Schema::create('relays', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->integer('relay')->nullable();
+            $table->integer('pin')->nullable();
+            $table->string('type')->nullable();
             $table->timestamps();
         });
     }
