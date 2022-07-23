@@ -18,7 +18,7 @@ class CreatePlantsTable extends Migration
             $table->increments('id')->unique();
             $table->string('name', 50)->nullable();
             $table->date('plant_date')->nullable();
-            $table->string('location', 100)->nullable();
+            $table->foreignId('location_id')->nullable();
             $table->date('harvest_date')->nullable();
             $table->timestamps();
         });
