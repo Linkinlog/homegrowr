@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reading extends Model
 {
@@ -143,9 +144,9 @@ class Reading extends Model
     /**
      * Defines the relationship between the reading and its sensor
      *
-     * @return void | relationship
+     * @return BelongsTo
      */
-    public function sensor()
+    public function sensor(): BelongsTo
     {
         return $this->belongsTo(Sensor::class);
     }
@@ -153,10 +154,20 @@ class Reading extends Model
     /**
      * Defines the relationship between the reading and its status
      *
-     * @return void | relationship
+     * @return BelongsTo
      */
-    public function status()
+    public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);
+    }
+
+    /**
+     * Defines the relationship between the reading and its plant
+     *
+     * @return BelongsTo
+     */
+    public function plant(): BelongsTo
+    {
+        return $this->belongsTo(Reading::class);
     }
 }
