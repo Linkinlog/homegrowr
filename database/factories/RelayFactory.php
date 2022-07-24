@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Relay_type;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RelayFactory extends Factory
@@ -15,7 +16,9 @@ class RelayFactory extends Factory
     {
         return [
             'pin' => $this->faker->numberBetween(1, 100),
-            'type' => 'Power'
+            'type_id' => function () {
+                return Relay_type::factory()->createOne(['alias' => 'Power'])->id;
+            }
         ];
     }
 }

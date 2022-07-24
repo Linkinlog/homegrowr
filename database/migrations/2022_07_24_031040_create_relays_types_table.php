@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRelaysTable extends Migration
+class CreateRelaysTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateRelaysTable extends Migration
      */
     public function up()
     {
-        Schema::create('relays', function (Blueprint $table) {
+        Schema::create('relay_type', function (Blueprint $table) {
             $table->increments('id')->unique();
-            $table->integer('pin')->nullable();
-            $table->foreignId('type_id');
+            $table->string('alias');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ class CreateRelaysTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('relay_pins');
+        Schema::dropIfExists('relay_type');
     }
 }
