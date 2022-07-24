@@ -29,18 +29,33 @@ class Plant extends Model
         'location_id'
     ];
 
+    /**
+     * Returns sensors belonging to this plant
+     *
+     * @return BelongsToMany
+     */
     public function sensors(): BelongsToMany
     {
         return $this->belongsToMany(Sensor::class);
     }
 
-    public function locations(): BelongsTo
+    /**
+     * Returns the location this plant belongs to
+     *
+     * @return BelongsTo
+     */
+    public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
 
-    public function readings(): HasMany
+    /**
+     * Returns the readings belonging to this plant
+     *
+     * @return BelongsToMany
+     */
+    public function readings(): BelongsToMany
     {
-        return $this->hasMany(Reading::class);
+        return $this->belongsToMany(Reading::class);
     }
 }

@@ -13,10 +13,14 @@ class Type extends Model
     protected $table = 'types';
 
     protected $fillable = [
-        'type'
+        'alias'
     ];
 
-    /** @var Sensor $sensors */
+    /**
+     * Returns the sensors belonging to this Type
+     *
+     * @return BelongsToMany
+     */
     public function sensors(): BelongsToMany
     {
         return $this->belongsToMany(Sensor::class);

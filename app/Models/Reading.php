@@ -8,6 +8,7 @@ use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Reading extends Model
 {
@@ -166,8 +167,8 @@ class Reading extends Model
      *
      * @return BelongsTo
      */
-    public function plant(): BelongsTo
+    public function plants(): BelongsToMany
     {
-        return $this->belongsTo(Reading::class);
+        return $this->belongsToMany(Plant::class);
     }
 }

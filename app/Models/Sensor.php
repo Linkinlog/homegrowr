@@ -20,7 +20,6 @@ class Sensor extends Model
 
     protected $fillable = [
         'alias',
-        'plant_id',
         'uuid',
         'ipaddr',
         'location_id'
@@ -90,31 +89,51 @@ class Sensor extends Model
             ->pluck('uuid');
     }
 
-    /** @var Reading $readings */
+    /**
+     * Returns the readings that this sensor has
+     *
+     * @return HasMany
+     */
     public function readings(): HasMany
     {
         return $this->hasMany(Reading::class);
     }
 
-    /** @var Plant $plants */
+    /**
+     * Returns the plants belonging to this sensor
+     *
+     * @return BelongsToMany
+     */
     public function plants(): BelongsToMany
     {
         return $this->belongsToMany(Plant::class);
     }
 
-    /** @var Location $locations */
-    public function locations(): BelongsTo
+    /**
+     * Returns this sensors location
+     *
+     * @return BelongsTo
+     */
+    public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
 
-    /** @var Type $types */
+    /**
+     * Returns the types belonging to this sensor
+     *
+     * @return BelongsToMany
+     */
     public function types(): BelongsToMany
     {
         return $this->belongsToMany(Type::class, 'type_sensor');
     }
 
-    /** @var Relay $relays */
+    /**
+     * Returns the relays belonging to this sensor
+     *
+     * @return BelongsToMany
+     */
     public function relays(): BelongsToMany
     {
         return $this->belongsToMany(Relay::class);
