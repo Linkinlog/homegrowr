@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Location;
+use App\Models\PlantLocation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PlantFactory extends Factory
@@ -21,7 +21,7 @@ class PlantFactory extends Factory
             'plant_date' => $this->faker->dateTime(),
             'harvest_date' => $this->faker->dateTime(),
             'location_id' => function () {
-                return Location::factory()->create()->id;
+                return PlantLocation::factory()->createOne()->id;
             }
         ];
     }

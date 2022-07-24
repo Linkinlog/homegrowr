@@ -9,12 +9,14 @@ class TypeFactory extends Factory
     /**
      * Define the model's default state.
      *
+     * * Sensor Types
+     * 
      * @return array
      */
     public function definition()
     {
         return [
-            'type' => 'Humidity'
+            'alias' => 'Humidity'
         ];
     }
 }

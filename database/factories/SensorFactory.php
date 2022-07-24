@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Location;
+use App\Models\SensorLocation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SensorFactory extends Factory
@@ -21,7 +21,7 @@ class SensorFactory extends Factory
             'uuid' => $this->faker->uuid(),
             'ipaddr' => $this->faker->ipv4(),
             'location_id' => function () {
-                return Location::factory()->create()->id;
+                return SensorLocation::factory()->createOne()->id;
             }
         ];
     }
