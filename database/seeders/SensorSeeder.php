@@ -3,9 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Plant;
-use App\Models\Relay;
+use App\Models\Reading;
 use App\Models\Sensor;
 use App\Models\Type;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Database\Seeder;
 
 class SensorSeeder extends Seeder
@@ -19,11 +20,12 @@ class SensorSeeder extends Seeder
     {
         Sensor::factory()
             ->count(5)
-            ->hasReadings(50)
-            ->hasLocations(2)
-            ->hasPlants(2)
-            ->hasRelays(2)
-            ->hasTypes(2)
+            ->has(
+                Reading::factory()->hasPlants()
+            )
+            ->hasRelays()
+            // ->has(Relay::factory()->hasSensors())
+            ->has(Type::factory()->state(new Sequence(['alias' => 'Humidity'], ['alias' => 'Temperature'])))
             ->create();
     }
 }

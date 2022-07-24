@@ -19,8 +19,8 @@ class ReadingSeeder extends Seeder
     {
         Reading::factory()
             ->count(50)
-            ->for( Sensor::factory()->create())
-            ->has(Plant::factory())
+            ->forSensor()
+            ->hasPlants(2)
             ->create();
     }
 }
