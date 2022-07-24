@@ -14,7 +14,7 @@ class StatusSeeder extends Seeder
      */
     public function run()
     {
-        Status::factory()->create(['Status' => 'Success']);
-        Status::factory()->create(['Status' => 'Failure']);
+        Status::factory()->create(['status' => 'Success']);
+        Status::factory()->create(['status' => 'Failure']);
     }
 }
