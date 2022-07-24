@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Location;
+use App\Models\SensorLocation;
 use Illuminate\Database\Seeder;
 
-class LocationSeeder extends Seeder
+class SensorLocationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class LocationSeeder extends Seeder
      */
     public function run()
     {
-        Location::factory()
+        SensorLocation::factory()
             ->count(10)
             ->create();
     }

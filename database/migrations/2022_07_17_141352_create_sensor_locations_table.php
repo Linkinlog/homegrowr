@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePlantsSensorsTable extends Migration
+class CreateSensorLocationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreatePlantsSensorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('plant_sensor', function (Blueprint $table) {
-            $table->increments('id')->nullable();
-            $table->foreignId('plant_id');
-            $table->foreignId('sensor_id');
+        Schema::create('sensor_locations', function (Blueprint $table) {
+            $table->increments('id')->unique();
+            $table->string('alias')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -27,6 +27,6 @@ class CreatePlantsSensorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plants_sensors');
+        Schema::dropIfExists('sensor_locations');
     }
 }

@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class LocationFactory extends Factory
+class SensorLocationFactory extends Factory
 {
     /**
      * Define the model's default state.
