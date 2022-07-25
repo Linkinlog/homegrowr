@@ -1,8 +1,8 @@
 <?php
 
 use \App\Models\Reading;
-use \App\Models\Plants;
-use \App\Models\Sensors;
+use \App\Models\Plant;
+use \App\Models\Sensor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Api\ReadingsController;
@@ -29,7 +29,7 @@ Routes
  */
 Route::get('/status', function ()
 {
-    $sensors = Sensors::select('alias', 'uuid')
+    $sensors = Sensor::select('alias', 'uuid')
         ->groupBy('uuid')
         ->get();
     echo '<ul>';
@@ -64,11 +64,11 @@ Route::post('/sensors', function () {
     }
     $uuid = $_REQUEST['uuid'];
     $type = strtolower($_REQUEST['type']);
-    $sensor = Sensors::find(Sensors::getSensorsfromUUID($uuid, $type)->id) ?? new Sensors;
-    // $sensor = new Sensors;
+    $sensor = Sensor::find(Sensor::getSensorfromUUID($uuid, $type)->id) ?? new Sensor;
+    // $sensor = new Sensor;
     $sensor->type = $type;
     $sensor->uuid = $uuid;
-    $sensor->plants_id = isset($_REQUEST['plants_id']) ? intval($_REQUEST['plants_id']) : 0;
+    $sensor->plant_id = isset($_REQUEST['plant_id']) ? intval($_REQUEST['plant_id']) : 0;
     $sensor->relay_pin = isset($_REQUEST['relay_pin']) ? intval($_REQUEST['relay_pin']) : 0;
     if ($_REQUEST['ipaddr']) {
         $sensor->ipaddr = isset($_REQUEST['ipaddr']) ? $_REQUEST['ipaddr'] : 0;
@@ -79,7 +79,7 @@ Route::post('/sensors', function () {
 //* Create {plant}
 Route::post('/plants', function () {
     if (!isset($_REQUEST['name']) || !isset($_REQUEST['plant_date']) || !isset($_REQUEST['harvest_date']) || !isset($_REQUEST['location']));
-    $plant = new Plants;
+    $plant = new Plant;
     $plant->name = $_REQUEST['name'];
     $plant->plant_date = $_REQUEST['plant_date'];
     $plant->harvest_date = $_REQUEST['harvest_date'];
@@ -109,7 +109,7 @@ Route::get('/', function () {
  * @return string reading of relay
  */
 Route::get('/relay_pin/{uuid}', function ($uuid) {
-    $id = Sensors::where('uuid', $uuid)->first()->value('relay_pin');
+    $id = Sensor::where('uuid', $uuid)->first()->value('relay_pin');
     return exec("sudo /usr/bin/python3 /opt/scripts/relay-switcher.py $id query");
 });
 
@@ -121,7 +121,7 @@ Route::get('/relay_pin/{uuid}', function ($uuid) {
  * Query all sensors
  */
 Route::get('/sensors', function () {
-    return Sensors::limit('50')->get();
+    return Sensor::limit('50')->get();
 });
 
 /**
@@ -132,7 +132,7 @@ Route::get('/sensors', function () {
  * @return array all active uuids
  */
 Route::get('/sensors/uuids', function () {
-    return Sensors::getUUIDs();
+    return Sensor::getUUIDs();
 });
 
 /**
@@ -143,7 +143,7 @@ Route::get('/sensors/uuids', function () {
  * @return array all active uuids
  */
 Route::get('/sensors/name/{uuid}', function ($uuid) {
-    return Sensors::getNameFromUUID($uuid);
+    return Sensor::getNameFromUUID($uuid);
 });
 
 //* Read {plant}
@@ -154,7 +154,7 @@ Route::get('/sensors/name/{uuid}', function ($uuid) {
  * @return array plants
  */
 Route::get('/plants', function () {
-    return Plants::limit('50')->get();
+    return Plant::limit('50')->get();
 });
 
 //* Update {sensor}

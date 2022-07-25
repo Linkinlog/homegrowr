@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use \App\Models\Sensors;
+use \App\Models\Sensor;
 use Illuminate\Http\Request;
 
 Route::get('/overview', function () {
-    $atmosphere = Sensors::getUUIDsAndName('atmosphere');
-    $cameras = Sensors::getUUIDsAndName('camera');
+    $atmosphere = Sensor::getUUIDsAndName('atmosphere');
+    $cameras = Sensor::getUUIDsAndName('camera');
     return view('overview', ['atmosphere' => $atmosphere->toArray(), 'cameras' => $cameras->toArray()]);
 });
 
