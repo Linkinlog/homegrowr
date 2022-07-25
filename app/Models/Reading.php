@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use App\Models\Sensors;
+use App\Models\Sensor;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Reading extends Model
 {
@@ -16,19 +19,19 @@ class Reading extends Model
      */
     protected $table = 'readings';
 
+    use HasFactory;
+
     protected $fillable = [
-        'sensors_id',
+        'sensor_id',
         'value',
         'status_id'
     ];
 
     public static function atmosphere()
     {
-        $sensors = Sensors::where('type', 'humidity')->orWhere('type', 'temperature')->get()->pluck('id');
-
         $readings = Reading::join('sensors', function ($join)
             {
-            $join->on('readings.sensors_id', 'sensors.id');
+            $join->on('readings.sensor_id', 'sensors.id');
             })
             ->where('sensors.type', 'humidity')
             ->orWhere('sensors.type', 'temperature')
@@ -49,16 +52,16 @@ class Reading extends Model
     public static function getReadingsByUUID($uuid, $formatted = NULL)
     {
         isset($_REQUEST['type']) ? $type = $_REQUEST['type'] : $type = NULL;
-        if ($type == 'soil' && !isset($_REQUEST['plants_id'])) {
+        if ($type == 'soil' && !isset($_REQUEST['plant_id'])) {
             return ['error' => 'No plants id'];
         }
         $readings = Reading::select('value', 'updated_at', 'type', 'alias', 'relay_pin')
             ->leftJoin('sensors', function ($join) use ($uuid) {
-                $join->on('sensors.id', 'readings.sensors_id');
+                $join->on('sensors.id', 'readings.sensor_id');
                 $join->on('sensors.UUID', DB::raw("'$uuid'"));
-                $join->when(isset($_REQUEST['plants_id']), function () use ($join)
+                $join->when(isset($_REQUEST['plant_id']), function () use ($join)
                 {
-                    $join->on('sensors.plants_id', DB::raw($_REQUEST['plants_id']));
+                    $join->on('sensors.plant_id', DB::raw($_REQUEST['plant_id']));
                 });
             })
             ->when($type, function ($query) use ($type){
@@ -68,9 +71,7 @@ class Reading extends Model
                 $query->orWhere('type', 'humidity');
             })
             ->orderByDesc('updated_at')
-            ->whereRaw('updated_at between
-            (select date(updated_at) from readings where updated_at < current_date()
-             order by updated_at desc limit 1) and now()')
+            ->whereRaw('updated_at between (select date(updated_at) from readings where updated_at < current_date() order by updated_at desc limit 1) and now()')
             ->limit(1000);
         $readings = $readings->get();
 
@@ -104,7 +105,7 @@ class Reading extends Model
 
     public static function checkAll()
     {
-        $uuids = Sensors::select('uuid')
+        $uuids = Sensor::select('uuid')
             ->distinct()
             ->pluck('uuid');
         foreach ($uuids as $uuid) {
@@ -138,5 +139,36 @@ class Reading extends Model
             return "$pin Off ";
         }
 
+    }
+
+
+    /**
+     * Defines the relationship between the reading and its sensor
+     *
+     * @return BelongsTo
+     */
+    public function sensor(): BelongsTo
+    {
+        return $this->belongsTo(Sensor::class);
+    }
+    
+    /**
+     * Defines the relationship between the reading and its status
+     *
+     * @return BelongsTo
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class);
+    }
+
+    /**
+     * Defines the relationship between the reading and its plant
+     *
+     * @return BelongsTo
+     */
+    public function plants(): BelongsToMany
+    {
+        return $this->belongsToMany(Plant::class);
     }
 }
