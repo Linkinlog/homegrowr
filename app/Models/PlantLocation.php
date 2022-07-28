@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Plants extends Model
+class PlantLocation extends Model
 {
-    
+    use HasFactory;
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'plants';
+    protected $table = 'plant_locations';
+
 
     protected $fillable = [
-        'name',
-        'plant_date',
-        'harvest_date',
-        'location'
+        'alias'
     ];
-
 }

@@ -1,13 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use \App\Models\Sensors;
+use \App\Models\Sensor;
 use Illuminate\Http\Request;
 
 Route::get('/overview', function () {
-    $atmosphere = Sensors::getUUIDsAndName('atmosphere');
-    $cameras = Sensors::getUUIDsAndName('camera');
-    return view('overview', ['atmosphere' => $atmosphere->toArray(), 'cameras' => $cameras->toArray()]);
+    // $atmosphere = Sensor::getUUIDsAndName('atmosphere');
+    // $cameras = Sensor::getUUIDsAndName('camera');
+    // return view('overview', ['atmosphere' => $atmosphere->toArray(), 'cameras' => $cameras->toArray()]);
+    //TODO Scrap laravel routing and use vue routing
 });
 
 
