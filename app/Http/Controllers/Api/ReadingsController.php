@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Reading;
 use App\Models\Sensor;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
-
 
 class ReadingsController extends Controller
 {
@@ -15,16 +14,11 @@ class ReadingsController extends Controller
      * Display a listing of the resource.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        if (isset($request['limit'])) {
-            $limit = $request['limit'];
-        } else {
-            $limit = 10;
-        }
-        return Reading::getReadingsByTS($limit);
+        return response()->json(Reading::limit($request->limit)->get());
     }
 
     /**

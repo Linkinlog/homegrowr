@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Sensor;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -141,6 +142,16 @@ class Reading extends Model
 
     }
 
+    /**
+     * Returns all readings and eager loads relationships
+     *
+     * @param int $limit
+     * @return Collection
+     */
+    public static function allEager(int $limit = 50): Collection
+    {
+        return Self::with('plants:id,name,location_id', 'plants.location:id,alias', 'sensor:id,alias,location_id', 'sensor.location:id,alias')->limit($limit)->get(['id','value', 'sensor_id']);
+    }
 
     /**
      * Defines the relationship between the reading and its sensor
